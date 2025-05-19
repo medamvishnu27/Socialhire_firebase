@@ -1,0 +1,117 @@
+/* Base styles */
+:root {
+    --header-height: 4rem;
+    --nav-width: 16rem;
+  }
+  
+  /* Container widths */
+  .container-sm {
+    @apply max-w-screen-sm mx-auto px-4;
+  }
+  
+  .container-md {
+    @apply max-w-screen-md mx-auto px-4 sm:px-6;
+  }
+  
+  .container-lg {
+    @apply max-w-screen-lg mx-auto px-4 sm:px-6 lg:px-8;
+  }
+  
+  .container-xl {
+    @apply max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+  
+  /* Responsive text sizes */
+  .text-responsive {
+    @apply text-base sm:text-lg lg:text-xl;
+  }
+  
+  .heading-responsive {
+    @apply text-2xl sm:text-3xl lg:text-4xl font-bold;
+  }
+  
+  .subheading-responsive {
+    @apply text-lg sm:text-xl lg:text-2xl;
+  }
+  
+  /* Responsive spacing */
+  .section-padding {
+    @apply py-8 sm:py-12 lg:py-16;
+  }
+  
+  .content-padding {
+    @apply p-4 sm:p-6 lg:p-8;
+  }
+  
+  /* Responsive grid layouts */
+  .grid-responsive-2 {
+    @apply grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 lg:gap-8;
+  }
+  
+  .grid-responsive-3 {
+    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8;
+  }
+  
+  .grid-responsive-4 {
+    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8;
+  }
+  
+  /* Responsive card layouts */
+  .card-responsive {
+    @apply bg-white rounded-lg shadow-md p-4 sm:p-6 lg:p-8 hover:shadow-lg transition-all duration-300;
+  }
+  
+  /* Responsive form elements */
+  .form-group-responsive {
+    @apply space-y-2 sm:space-y-3 lg:space-y-4;
+  }
+  
+  .input-responsive {
+    @apply w-full px-3 sm:px-4 py-2 sm:py-2.5 text-sm sm:text-base;
+  }
+  
+  /* Responsive buttons */
+  .btn-responsive {
+    @apply px-4 sm:px-6 py-2 sm:py-2.5 text-sm sm:text-base;
+  }
+  
+  /* Responsive navigation */
+  .nav-link {
+    @apply px-3 py-2 sm:px-4 sm:py-2.5 text-sm sm:text-base;
+  }
+  
+  /* Responsive modal */
+  .modal-responsive {
+    @apply max-w-sm sm:max-w-md lg:max-w-lg xl:max-w-xl mx-auto;
+  }
+  
+  /* Responsive tables */
+  .table-responsive {
+    @apply min-w-full divide-y divide-gray-200 overflow-x-auto;
+  }
+  
+  /* Responsive images */
+  .img-responsive {
+    @apply w-full h-auto object-cover;
+  }
+  
+  /* Responsive typography utilities */
+  @responsive {
+    .text-balance {
+      text-wrap: balance;
+    }
+  }
+  
+  /* Dark mode support */
+  @media (prefers-color-scheme: dark) {
+    .dark\:card-responsive {
+      @apply bg-gray-800 text-white;
+    }
+  }
+  
+  /* Print styles */
+  @media print {
+    .print\:hidden {
+      display: none;
+    }
+  }

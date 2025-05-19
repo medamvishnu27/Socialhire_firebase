@@ -1,0 +1,52 @@
+@import url('https://fonts.googleapis.com/css2?family=Questrial&family=Raleway:ital,wght@0,100..900;1,100..900&display=swap');
+
+@import '../src//styles//responsive.css';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+}
+
+/* Apply background to html instead of body for better coverage */
+html {
+  min-height: 100vh;
+  background-image: url('/bgimg.jpg');  /* Image path now references the public folder */
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-primary-600 hover:bg-primary-700 text-white font-bold py-2 px-4 rounded transition-all duration-300;
+  }
+  
+  .btn-secondary {
+    @apply bg-white hover:bg-gray-100 text-primary-600 font-bold py-2 px-4 rounded border border-primary-600 transition-all duration-300;
+  }
+  
+  .card {
+    @apply bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-all duration-300;
+  }
+  
+  .input-field {
+    @apply w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500;
+  }
+  
+  .gradient-bg {
+    @apply bg-purple-gradient;
+  }
+}
