@@ -4,6 +4,8 @@ import jobsReducer from './slices/jobsSlice';
 import mentorsReducer from './slices/mentorsSlice';
 import webinarsReducer from './slices/webinarsSlice';
 import placementReducer from './slices/placementSlice';
+import commentsReducer from './slices/commentsSlice';
+import blogReducer from './slices/blogsSlice'
 
 export const store = configureStore({
   reducer: {
@@ -12,6 +14,8 @@ export const store = configureStore({
     mentors: mentorsReducer,
     webinars: webinarsReducer,
     placement: placementReducer,
+    comments: commentsReducer,
+    blogs: blogReducer
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

@@ -2,7 +2,7 @@ import { useEffect, useCallback, useState, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { motion } from 'framer-motion';
 import { subscribeToWebinarsAndSessions, clearWebinars } from '../redux/slices/webinarsSlice';
-import { FiCalendar, FiClock, FiUser, FiVideo, FiExternalLink, FiBriefcase } from 'react-icons/fi';
+import { FiCalendar, FiClock, FiUser, FiVideo, FiExternalLink, FiBriefcase, FiShare2, FiCheck, FiCopy } from 'react-icons/fi';
 import bg3 from '/bg-3.png';
 
 const Webinars = () => {
@@ -10,7 +10,8 @@ const Webinars = () => {
   const { items: allItems, loading, error } = useSelector((state) => state.webinars);
   const { user } = useSelector((state) => state.auth);
   const [currentTime, setCurrentTime] = useState(new Date());
-  const unsubscribeRef = useRef({ webinars: null, sessions: null }); // Store unsubscribe functions
+  const [copiedItemId, setCopiedItemId] = useState(null);
+  const unsubscribeRef = useRef({ webinars: null, sessions: null });
 
   useEffect(() => {
     const unsubscribePromise = dispatch(subscribeToWebinarsAndSessions());
@@ -21,19 +22,16 @@ const Webinars = () => {
 
     return () => {
       clearInterval(timer);
-      // Cleanup Firestore listeners
       if (unsubscribeRef.current.webinars) unsubscribeRef.current.webinars();
       if (unsubscribeRef.current.sessions) unsubscribeRef.current.sessions();
       dispatch(clearWebinars());
     };
   }, [dispatch]);
 
-  // Modify the thunk subscription to store unsubscribe functions in ref
   useEffect(() => {
     const setupSubscriptions = async () => {
       const { unwrap } = dispatch(subscribeToWebinarsAndSessions());
-      await unwrap(); // Wait for the thunk to set up listeners
-      // The unsubscribe functions are already set up in the thunk and stored in unsubscribeRef
+      await unwrap();
     };
     setupSubscriptions();
   }, [dispatch]);
@@ -115,6 +113,58 @@ const Webinars = () => {
     }
   };
 
+  const generateShareableLink = (item) => {
+    // Return the sessionLink provided during session/webinar creation
+    return item.sessionLink || '';
+  };
+
+  const handleShare = async (item) => {
+    const shareUrl = generateShareableLink(item);
+    if (!shareUrl) {
+      alert('No session link available to share for this event.');
+      return;
+    }
+
+    const shareData = {
+      title: item.type === 'webinar' ? item.title : `Session with ${item.mentor?.name}`,
+      text: item.type === 'webinar' ? item.description : item.topic,
+      url: shareUrl
+    };
+
+    try {
+      if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
+        await navigator.share(shareData);
+      } else {
+        // Fallback to clipboard
+        await navigator.clipboard.writeText(shareUrl);
+        setCopiedItemId(item.id);
+        setTimeout(() => setCopiedItemId(null), 2000);
+      }
+    } catch (error) {
+      // Fallback to clipboard if share fails
+      try {
+        await navigator.clipboard.writeText(shareUrl);
+        setCopiedItemId(item.id);
+        setTimeout(() => setCopiedItemId(null), 2000);
+      } catch (clipboardError) {
+        // Final fallback - create a temporary input to copy
+        const tempInput = document.createElement('input');
+        tempInput.value = shareUrl;
+        document.body.appendChild(tempInput);
+        tempInput.select();
+        document.execCommand('copy');
+        document.body.removeChild(tempInput);
+        setCopiedItemId(item.id);
+        setTimeout(() => setCopiedItemId(null), 2000);
+      }
+    }
+  };
+
+  const canShare = (item) => {
+    const status = getSessionStatus(item);
+    return status.text === 'Register' || status.text === 'Join Now';
+  };
+
   const renderItem = (item) => (
     <motion.div
       key={item.id}
@@ -124,15 +174,30 @@ const Webinars = () => {
       <div className="p-6">
         <div className="flex justify-between items-start mb-4">
           <span className="text-primary-600 font-semibold">{formatDate(item.date)}</span>
-          <span
-            className={`text-xs font-semibold px-2.5 py-0.5 rounded ${
-              item.type === 'webinar'
-                ? 'bg-primary-100 text-primary-800'
-                : 'bg-green-100 text-green-800'
-            }`}
-          >
-            {item.type === 'webinar' ? item.category : 'Mentoring Session'}
-          </span>
+          <div className="flex items-center space-x-2">
+            <span
+              className={`text-xs font-semibold px-2.5 py-0.5 rounded ${
+                item.type === 'webinar'
+                  ? 'bg-primary-100 text-primary-800'
+                  : 'bg-green-100 text-green-800'
+              }`}
+            >
+              {item.type === 'webinar' ? item.category : 'Mentoring Session'}
+            </span>
+            {canShare(item) && (
+              <button
+                onClick={() => handleShare(item)}
+                className="p-1.5 text-gray-400 hover:text-primary-600 hover:bg-primary-50 rounded-full transition-colors"
+                title="Share session"
+              >
+                {copiedItemId === item.id ? (
+                  <FiCheck className="h-4 w-4 text-green-600" />
+                ) : (
+                  <FiShare2 className="h-4 w-4" />
+                )}
+              </button>
+            )}
+          </div>
         </div>
 
         <h3 className="text-lg font-semibold text-gray-900 mb-2">
@@ -167,13 +232,15 @@ const Webinars = () => {
           </div>
         </div>
 
-        <button
-          onClick={() => handleJoinSession(getSessionStatus(item).link)}
-          className={`btn-primary w-full ${getSessionStatus(item).disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-          disabled={getSessionStatus(item).disabled}
-        >
-          {getSessionStatus(item).text}
-        </button>
+        <div className="flex space-x-3">
+          <button
+            onClick={() => handleJoinSession(getSessionStatus(item).link)}
+            className={`btn-primary w-full ${getSessionStatus(item).disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+            disabled={getSessionStatus(item).disabled}
+          >
+            {getSessionStatus(item).text}
+          </button>
+        </div>
       </div>
     </motion.div>
   );
@@ -186,9 +253,24 @@ const Webinars = () => {
     >
       <div className="md:flex">
         <div className="md:w-2/3 p-8 text-white">
-          <span className="inline-block bg-white bg-opacity-20 rounded-full px-3 py-1 text-sm font-semibold mb-4">
-            Featured
-          </span>
+          <div className="flex items-center justify-between mb-4">
+            <span className="inline-block bg-white bg-opacity-20 rounded-full px-3 py-1 text-sm font-semibold">
+              Featured
+            </span>
+            {canShare(item) && (
+              <button
+                onClick={() => handleShare(item)}
+                className="p-2 text-white hover:bg-white hover:bg-opacity-20 rounded-full transition-colors"
+                title="Share session"
+              >
+                {copiedItemId === item.id ? (
+                  <FiCheck className="h-5 w-5" />
+                ) : (
+                  <FiShare2 className="h-5 w-5" />
+                )}
+              </button>
+            )}
+          </div>
           <h2 className="text-2xl md:text-3xl font-bold mb-3">
             {item.type === 'webinar' ? item.title : `Session with ${item.mentor?.name}`}
           </h2>

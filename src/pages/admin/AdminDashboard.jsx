@@ -10,6 +10,7 @@ import JobsCRUD from './JobsCRUD';
 import SessionsCRUD from './SessionsCRUD';
 import AdminOverview from './AdminOverview';
 import PlacementCRUD from './PlacementCRUD';
+import BlogCrud from './BlogCrud';
 
 const AdminDashboard = () => {
   const location = useLocation();
@@ -58,6 +59,9 @@ const AdminDashboard = () => {
   const handleManagePlacement = () => {
     navigate('/admin/placement');
   };
+  const handleManageBlog=()=>{
+    navigate('/admin/blog')
+  }
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -98,7 +102,8 @@ const AdminDashboard = () => {
                 !isActive('/admin/students') &&
                 !isActive('/admin/jobs') &&
                 !isActive('/admin/sessions') &&
-                !isActive('/admin/placement')
+                !isActive('/admin/placement')&&
+                !isActive('/admin/blog') 
                   ? 'bg-primary-100 text-primary-700'
                   : 'text-gray-700 hover:bg-gray-100'
               }`}
@@ -171,6 +176,20 @@ const AdminDashboard = () => {
               <FiBook className="mr-3 h-5 w-5" />
               Placement
             </Link>
+
+            <Link
+              to="/admin/blog"
+              onClick={closeMobileSidebar}
+              className={`flex items-center px-4 py-3 text-sm font-medium rounded-md ${
+                isActive('/admin/blog')
+                  ? 'bg-primary-100 text-primary-700'
+                  : 'text-gray-700 hover:bg-gray-100'
+              }`}
+            >
+              <FiBook className="mr-3 h-5 w-5" />
+              Blog Mangament
+            </Link>
+            
           </nav>
         </div>
       </div>
@@ -214,6 +233,7 @@ const AdminDashboard = () => {
               <Route path="/jobs" element={<JobsCRUD />} />
               <Route path="/sessions" element={<SessionsCRUD />} />
               <Route path="/placement" element={<PlacementCRUD />} />
+              <Route path="/blog" element={<BlogCrud />} />
             </Routes>
           </motion.div>
         </main>
